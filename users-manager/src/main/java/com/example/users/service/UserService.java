@@ -5,6 +5,7 @@ import com.example.users.domain.repository.UserRepository;
 import com.example.users.dto.ResponseDTO;
 import com.example.users.dto.UserDTO;
 import com.example.users.events.UserManagerProducer;
+import com.example.users.external.AccountServiceClient;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataAccessException;
@@ -20,12 +21,12 @@ public class UserService {
 
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
-    private final UserManagerProducer userManagerProducer;
+    private final AccountServiceClient accountServiceClient;
 
-    public UserService(ModelMapper modelMapper, UserRepository userRepository, UserManagerProducer userManagerProducer) {
+    public UserService(ModelMapper modelMapper, UserRepository userRepository, AccountServiceClient accountServiceClient) {
         this.modelMapper = modelMapper;
         this.userRepository = userRepository;
-        this.userManagerProducer = userManagerProducer;
+        this.accountServiceClient = accountServiceClient;
     }
 
     @Transactional
@@ -35,6 +36,7 @@ public class UserService {
         try {
             User user = modelMapper.map(userDTO, User.class);
             userRepository.save(user);
+            accountServiceClient.sendDataAccountService(userDTO);
         } catch (DataAccessException e) {
             log.error("Error saving user to the database: {}", e.getMessage());
             throw new RuntimeException("Failed to save user to the database");
