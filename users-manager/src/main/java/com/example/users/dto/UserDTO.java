@@ -12,12 +12,11 @@ import java.util.UUID;
 @Data
 public class UserDTO{
 
-        @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
         @Schema(hidden = true)
         private Long id;
 
-        @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-        private UUID idReference = UUID.randomUUID();
+        @Schema(hidden = true)
+        private UUID idReference;
 
         @Size(min = 3, max = 50, message = "The name must be between 3 and 50 characters.")
         private String name;
@@ -25,6 +24,6 @@ public class UserDTO{
         @Email(message = "The email must be valid.")
         private String email;
 
-        @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-        private LocalDateTime dateCreated = LocalDateTime.now();
+        @Schema(hidden = true)
+        private LocalDateTime dateCreated;
 }

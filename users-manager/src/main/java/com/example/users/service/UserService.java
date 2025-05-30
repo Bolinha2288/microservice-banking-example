@@ -13,7 +13,9 @@ import org.springframework.kafka.KafkaException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -34,6 +36,8 @@ public class UserService {
         log.info("Starting user create: {}", userDTO);
 
         try {
+            userDTO.setIdReference(UUID.randomUUID());
+            userDTO.setDateCreated(LocalDateTime.now());
             User user = modelMapper.map(userDTO, User.class);
             userRepository.save(user);
             accountServiceClient.sendDataAccountService(userDTO);
