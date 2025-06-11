@@ -50,7 +50,7 @@ public class KafkaConsumerConfig {
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
 
         DefaultErrorHandler errorHandler = new DefaultErrorHandler(
-                new FixedBackOff(30000L, 5)
+                new FixedBackOff(30000L, 20)
         );
 
         factory.setCommonErrorHandler(errorHandler);

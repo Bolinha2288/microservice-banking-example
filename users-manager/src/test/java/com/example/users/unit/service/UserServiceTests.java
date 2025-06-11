@@ -4,7 +4,7 @@ import com.example.users.domain.model.User;
 import com.example.users.domain.repository.UserRepository;
 import com.example.users.dto.ResponseDTO;
 import com.example.users.dto.UserDTO;
-import com.example.users.events.UserManagerProducer;
+import com.example.users.external.AccountServiceClient;
 import com.example.users.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataAccessException;
-import org.springframework.kafka.KafkaException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,14 +25,14 @@ class UserServiceTests {
     private UserRepository userRepository;
 
     @Mock
-    private UserManagerProducer userManagerProducer;
+    AccountServiceClient accountServiceClient;
 
     private UserService userService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        userService = new UserService(modelMapper, userRepository, userManagerProducer);
+        userService = new UserService(modelMapper, userRepository, accountServiceClient);
     }
 
     @Test
@@ -47,7 +46,7 @@ class UserServiceTests {
 
         when(modelMapper.map(userDTO, User.class)).thenReturn(user);
         when(userRepository.save(user)).thenReturn(user);
-        doNothing().when(userManagerProducer).sendMessage(userDTO);
+        when(accountServiceClient.sendDataAccountService(userDTO)).thenReturn(new ResponseDTO(anyString(), anyList()));
 
         ResponseDTO response = userService.createUser(userDTO);
 
@@ -57,7 +56,7 @@ class UserServiceTests {
         assertEquals(userDTO, response.data().get(0));
 
         verify(userRepository, times(1)).save(user);
-        verify(userManagerProducer, times(1)).sendMessage(userDTO);
+        verify(accountServiceClient, times(1)).sendDataAccountService(userDTO);
     }
 
     @Test
@@ -73,23 +72,7 @@ class UserServiceTests {
         assertEquals("Failed to save user to the database", exception.getMessage());
 
         verify(userRepository, times(1)).save(user);
-        verify(userManagerProducer, never()).sendMessage(any());
-    }
-
-    @Test
-    void shouldThrowExceptionWhenKafkaFails() {
-        UserDTO userDTO = createUserDTO();
-        User user = new User();
-
-        when(modelMapper.map(userDTO, User.class)).thenReturn(user);
-        when(userRepository.save(user)).thenReturn(user);
-        doThrow(new KafkaException("Kafka error")).when(userManagerProducer).sendMessage(userDTO);
-
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> userService.createUser(userDTO));
-        assertEquals("Failed to send message to Kafka", exception.getMessage());
-
-        verify(userRepository, times(1)).save(user);
-        verify(userManagerProducer, times(1)).sendMessage(userDTO);
+        verify(accountServiceClient, never()).sendDataAccountService(any());
     }
 
     private UserDTO createUserDTO() {

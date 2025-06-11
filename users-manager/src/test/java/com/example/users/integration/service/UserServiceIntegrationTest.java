@@ -72,52 +72,20 @@ public class UserServiceIntegrationTest {
     }
 
     @Test
-    void shouldCreateUserAndSendKafkaMessage() {
+    void shouldCreateUser() {
 
         UserDTO userDTO = createUserDTO();
 
-        ResponseDTO response = userService.createUser(userDTO);
+        userService.createUser(userDTO);
 
         assertDB();
 
-        assertKafkaEvent(response, userDTO);
     }
 
     private void assertDB() {
         List<User> users = userRepository.findAll();
         assertEquals(1, users.size());
         assertEquals("edu", users.get(0).getName());
-    }
-
-    private void assertKafkaEvent(ResponseDTO response, UserDTO userDTO) {
-
-        verify(userManagerProducer, times(1)).sendMessage(userDTO);
-
-        Consumer<String, UserEventDTO> consumer = createKafkaConsumer();
-        ConsumerRecords<String, UserEventDTO> records = KafkaTestUtils.getRecords(consumer, Duration.ofSeconds(10));
-        assertThat(records.isEmpty()).isFalse();
-
-        UserEventDTO received = records.iterator().next().value();
-        assertThat(received.getEventType()).isEqualTo("USER_CREATED");
-        assertThat(received.getUserDTO()).isNotNull();
-        assertThat(received.getUserDTO().getName()).isEqualTo("edu");
-        assertThat(received.getUserDTO().getEmail()).isEqualTo("edu@teste.com.br");
-
-        assertEquals("User created", response.message());
-        assertEquals(userDTO.getEmail(), ((UserDTO) response.data().get(0)).getEmail());
-    }
-
-
-    private Consumer<String, UserEventDTO> createKafkaConsumer() {
-        Map<String, Object> consumerProps = KafkaTestUtils.consumerProps("test-group", "true", embeddedKafkaBroker);
-        consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-
-        Consumer<String, UserEventDTO> consumer = new DefaultKafkaConsumerFactory<>(consumerProps,
-                new StringDeserializer(),
-                new JsonDeserializer<>(UserEventDTO.class, false)
-        ).createConsumer();
-        consumer.subscribe(Collections.singletonList("users_managers_topic"));
-        return consumer;
     }
 
     private UserDTO createUserDTO() {

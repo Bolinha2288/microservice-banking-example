@@ -45,9 +45,7 @@ public class AccountServiceClient {
     private ResponseDTO fallbackResendAccount(UserDTO userDTO, Throwable t) {
         log.warn("Fallback: fail '{}'. Cause: {}", userDTO, t.getMessage());
 
-        if(Objects.nonNull(userDTO.getIdReference())){
-            userManagerProducer.sendMessage(userDTO);
-        }
+        //userManagerProducer.sendMessage(userDTO);
 
         ResponseDTO fallbackResponse = new ResponseDTO(
                 "Fail communicate with account-manager.",
