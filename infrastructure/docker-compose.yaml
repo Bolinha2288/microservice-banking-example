@@ -1,4 +1,24 @@
 services:
+
+  user-manager-service:
+    build: ../users-manager
+    ports:
+      - "8090:8080"
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+      DATASOURCE_URL: "jdbc:mysql://user-db:3306/users_manager?useSSL=false&serverTimezone=America/Sao_Paulo&allowPublicKeyRetrieval=true"
+      DATASOURCE_USERNAME: "root"
+      DATASOURCE_PASSWORD: "root"
+      ACCOUNT_MANAGER_BASE_URL:  "http://account-manager-service:8080/accounts"
+    depends_on:
+      - "kafka"
+      - "user-db"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 512M
+
   user-db:
     image: mysql:8.0
     container_name: user-db-mysql
@@ -12,6 +32,24 @@ services:
     volumes:
       - mysql_user_data:/var/lib/mysql
       - ./user-init-db:/docker-entrypoint-initdb.d:rw,z
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 512M
+
+  account-manager-service:
+    build: ../account-manager
+    ports:
+      - "8091:8080"
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+      DATASOURCE_URL: "jdbc:mysql://account-db:3306/accounts_manager?useSSL=false&serverTimezone=America/Sao_Paulo&allowPublicKeyRetrieval=true"
+      DATASOURCE_USERNAME: "root"
+      DATASOURCE_PASSWORD: "root"
+    depends_on:
+      - "kafka"
+      - "account-db"
     deploy:
       resources:
         limits:
