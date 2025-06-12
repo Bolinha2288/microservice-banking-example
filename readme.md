@@ -1,4 +1,4 @@
-This project consists of multiple services (`email-manager`, `account-manager`, and `user-manager`) that can be deployed using Docker and Docker Compose.
+This project consists of multiple services (`account-manager`, and `user-manager`) that can be deployed using Docker and Docker Compose.
 
 ## Prerequisites
 
@@ -39,12 +39,23 @@ This project consists of multiple services (`email-manager`, `account-manager`, 
 
     - **Circuit Breaker Actuator:** http://localhost:8090/actuator/circuitbreakers
 
+3. Checking messages sending to Apache Kafka:
+
+    - **Kafka UI:** http://localhost:8000
 
 ## Testing Circuit Breaker
 
+For see OPEN status on Circuit Breaker, make 10 request with account-service off, in this case image bellow 10 request on total, and 6 request with failed sending
 
 ![Check on open](docs/img/circuit-breaker-open.png)
 
+After 30 seconds make one more request to see HALF OPEN status on Circuit Breaker
+
 ![Check on half open](docs/img/circuit-breaker-half-open.png)
 
+And make requests with account-service up to see CLOSED status.
+
 ![Check on closed](docs/img/circuit-breaker-closed.png)
+
+
+> 📚 **Read more:** See the complete article on Medium: [Uma dose de resiliência nos micro serviços](https://medium.com/seu-link-aqui)
