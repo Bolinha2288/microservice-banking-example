@@ -1,4 +1,4 @@
-This project consists of multiple services (`account-manager`, and `user-manager`) that can be deployed using Docker and Docker Compose.
+The purpose of project is demonstrate how work Circuit Breaker and Broker message to provider more resilience into microservices.This project consists of multiple services (`account-manager`, and `user-manager`) that can be deployed using Docker and Docker Compose.
 
 ## Prerequisites
 
