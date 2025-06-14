@@ -58,4 +58,4 @@ And make requests with account-service up to see CLOSED status.
 ![Check on closed](docs/img/circuit-breaker-closed.png)
 
 
-> 📚 **Read more:** See the complete article on Medium: [Uma dose de resiliência nos micro serviços](https://medium.com/seu-link-aqui)
+> 📚 **Read more:** Read more about Resilience visit this articles on Medium: [Uma dose de resiliência nos micro serviços](https://medium.com/@eduardo.borsato.oli/uma-dose-de-resili%C3%AAncia-nos-micro-servi%C3%A7os-77105758d4bb) and [O que é um software Resiliente? ](https://medium.com/@eduardo.borsato.oli/o-que-%C3%A9-um-software-resiliente-283b35f97bc8)
